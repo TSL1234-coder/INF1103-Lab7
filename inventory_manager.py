@@ -4,8 +4,10 @@
 # =================
 # ======================================================================
 
-from product import Product
+
 from inventory import Inventory
+from physical_product import PhysicalProduct
+from digital_product import DigitalProduct
 from file_handler import save_inventory, load_inventory, INVENTORY_FILE
 
 
@@ -16,12 +18,13 @@ from file_handler import save_inventory, load_inventory, INVENTORY_FILE
 # ======================================================================
 
 def create_default_products():
-    return[
-        Product("1001", "Keyboard", 30.00, 10),
-        Product("1002", "Mouse", 20.00, 15),
-        Product("1003", "Monitor", 150.00, 5),
-        Product("1004", "Printer", 200.00, 3),
-        Product("1005", "Webcam", 50.00, 8), 
+    return [
+        PhysicalProduct("1001", "Keyboard", 30.00, 10, 0.8),
+        PhysicalProduct("1002", "Mouse", 20.00, 15, 0.1),
+        PhysicalProduct("1003", "Monitor", 150.00, 5, 4.5),
+        PhysicalProduct("1004", "Printer", 200.00, 3, 7.0),
+        DigitalProduct("1005", "Photo Editor", 59.90, 100, 250.0),
+        DigitalProduct("1006", "E-book", 15.00, 100, 5.0),
     ]
 
 def show_menu():
@@ -36,16 +39,31 @@ def show_menu():
 
 
 def add_product_input(inventory):
+    print("\nProduct type:")
+    print("1. Physical Product")
+    print("2. Digital Product")
+    type_choice = input("Enter product type (1 or 2): ")
+
+    if type_choice not in ('1', '2'):
+        print("Invalid choice. Please enter 1 or 2.")
+        return
+
+
     product_id = input("Enter Product ID: ")
     name = input("Enter Product Name: ")
     price = float(input("Enter Product Price: "))
     stock = int(input("Enter Product Stock: "))
-    new_product = Product(product_id, name, price, stock)
+
+    if type_choice == '1':
+        weight = float(input("Enter Product Weight (in kg): "))
+        new_product = PhysicalProduct(product_id, name, price, stock, weight)
+    else:
+        download_size = float(input("Enter Product Download Size (in MB): "))
+        new_product = DigitalProduct(product_id, name, price, stock, download_size)
 
     if inventory.add_product(new_product):
         print(f"Product {name} added successfully!")
-    else:
-        print(f"Product with ID {product_id} already exists. Cannot add duplicate product.")
+    
 
 def update_product_stock_input(inventory):
     product_id = input("Enter Product ID to update stock: ")
@@ -118,9 +136,7 @@ def main():
     # Load inventory from file if it exists
     setup_inventory(inventory)  
 
-    # Populate inventory with default products
-    for product in create_default_products():
-        inventory.add_product(product)
+   
 
 
     exit_program = False
