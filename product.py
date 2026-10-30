@@ -1,4 +1,6 @@
-class Product:
+from abc import ABC, abstractmethod
+
+class Product(ABC):
 
     def __init__(self, product_id, name, price, stock):
         self.__product_id = product_id
@@ -29,3 +31,9 @@ class Product:
         print(f"Name: {self.__name}")
         print(f"Price: ${self.__price:.2f}")
         print(f"Stock: {self.__stock} units")
+
+
+    @abstractmethod
+    def get_fulfillment_info(self):
+        """To return delivery/fulfillment info for this product"""
+        pass
