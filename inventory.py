@@ -23,7 +23,7 @@ class Inventory:
 
         print("\nCurrent Inventory:\n")
         for product in self.__products:
-            product.display_product_info()
+            product.display_information()
             print("-" * 20)
 
 

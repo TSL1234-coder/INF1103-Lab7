@@ -46,5 +46,11 @@
         "name": "USB",
         "price": 10.0,
         "stock": 40
+    },
+    {
+        "product_id": "1011",
+        "name": "Charger",
+        "price": 6.0,
+        "stock": 15
     }
 ]

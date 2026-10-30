@@ -70,7 +70,7 @@ def search_product_input(inventory):
         print(f"\nProduct with ID {product_id} not found.")
     else:
         print("\nProduct found:")
-        product.display_product_info()
+        product.display_information()
 
 
 
