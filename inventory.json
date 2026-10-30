@@ -1,0 +1,50 @@
+[
+    {
+        "product_id": "1001",
+        "name": "Keyboard",
+        "price": 30.0,
+        "stock": 10
+    },
+    {
+        "product_id": "1002",
+        "name": "Mouse",
+        "price": 20.0,
+        "stock": 15
+    },
+    {
+        "product_id": "1003",
+        "name": "Monitor",
+        "price": 150.0,
+        "stock": 5
+    },
+    {
+        "product_id": "1004",
+        "name": "Printer",
+        "price": 200.0,
+        "stock": 3
+    },
+    {
+        "product_id": "1005",
+        "name": "Webcam",
+        "price": 50.0,
+        "stock": 8
+    },
+    {
+        "product_id": "1008",
+        "name": "PC Adapter",
+        "price": 20.0,
+        "stock": 25
+    },
+    {
+        "product_id": "1009",
+        "name": "Ethernet Cable",
+        "price": 30.0,
+        "stock": 15
+    },
+    {
+        "product_id": "1010",
+        "name": "USB",
+        "price": 10.0,
+        "stock": 40
+    }
+]
