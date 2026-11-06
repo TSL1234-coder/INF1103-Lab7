@@ -100,7 +100,7 @@ def add_product_input(inventory: Inventory) -> None :
 def update_product_stock_input(inventory: Inventory) -> None:
     product_id: str = input("Enter Product ID to update stock: ")
 
-    product: Product | None = inventory.search_product(product_id)
+    product: Product | None = inventory.find_product(product_id)
     if product is None:
         print(f"Product with ID {product_id} not found.")
         return
@@ -115,7 +115,7 @@ def update_product_stock_input(inventory: Inventory) -> None:
 def search_product_input(inventory: Inventory)-> None:
     product_id: str = input("Enter Product ID to search: ")
 
-    product: Product | None = inventory.search_product(product_id)
+    product: Product | None = inventory.find_product(product_id)
     if product is None:
         print(f"\nProduct with ID {product_id} not found.")
     else:
