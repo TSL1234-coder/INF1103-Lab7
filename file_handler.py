@@ -1,19 +1,30 @@
 import os
 import json
+
 from physical_product import PhysicalProduct
 from digital_product import DigitalProduct
+from inventory import Inventory
+from supplier import Supplier
+from product import Product
 
 INVENTORY_FILE = "inventory.json"
 
 
-def save_inventory(inventory):
-    products_data = []
+def save_inventory(inventory: Inventory) -> bool:
+    products_data: list[dict[str, object]] = []
     for product in inventory.get_all_products():
-        product_data = {
+
+        supplier: Supplier = product.get_supplier()
+        product_data: dict[str, object] = {
             "product_id": product.get_product_id(),
             "name": product.get_name(),
             "price": product.get_price(),
-            "stock": product.get_stock()
+            "stock": product.get_stock(),
+            "supplier": {
+                "supplier_id": supplier.get_supplier_id(),
+                "name": supplier.get_name(),
+                "contact_email": supplier.get_contact_email()
+            }
         }
 
         if isinstance(product, PhysicalProduct):
@@ -38,7 +49,7 @@ def save_inventory(inventory):
 # ======================================================================
 # ======================================================================
 
-def load_inventory(inventory):
+def load_inventory(inventory) -> str:
     if not os.path.exists(INVENTORY_FILE):
         return "not_found"
 
@@ -46,8 +57,27 @@ def load_inventory(inventory):
         with open(INVENTORY_FILE, 'r') as file:
             products_data = json.load(file)
 
+
+            # One Supplier object per supplier_id, shared by all its products
+            suppliers: dict[str, Supplier] = {}
+
             for item in products_data:
 
+                supplier_data = item["supplier"]
+                supplier_id: str = supplier_data["supplier_id"]
+
+                if supplier_id not in suppliers:
+                    suppliers[supplier_id] = Supplier(
+                        supplier_id,
+                        name=supplier_data["name"],
+                        contact_email=supplier_data["contact_email"]
+                    )
+                supplier: Supplier = suppliers[supplier_id]
+
+
+
+
+                product: Product
                 product_type = item["type"]
 
                 if product_type == "physical":
@@ -56,6 +86,7 @@ def load_inventory(inventory):
                         name=item["name"],
                         price=item["price"],
                         stock=item["stock"],
+                        supplier = supplier,
                         weight=item["weight"]
                     )
                 elif product_type == "digital":
@@ -64,6 +95,7 @@ def load_inventory(inventory):
                         name=item["name"],
                         price=item["price"],
                         stock=item["stock"],
+                        supplier = supplier,
                         download_size=item["download_size"]
                     )
                 else:

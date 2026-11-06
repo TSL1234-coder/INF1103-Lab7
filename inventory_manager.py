@@ -9,6 +9,8 @@ from inventory import Inventory
 from physical_product import PhysicalProduct
 from digital_product import DigitalProduct
 from file_handler import save_inventory, load_inventory, INVENTORY_FILE
+from product import Product
+from supplier import Supplier
 
 
 # ======================================================================
@@ -17,14 +19,20 @@ from file_handler import save_inventory, load_inventory, INVENTORY_FILE
 # =================
 # ======================================================================
 
-def create_default_products():
+def create_default_products() -> list[Product]:
+
+    # Suppliers created first, then shared with several products
+    tech_supplier =  Supplier("S001", "Tech Supplies Inc.", "sales@techsupplies.com")
+    soft_supplier =  Supplier("S002", "Software Solutions Ltd.", "hello@softwaresolutions.com")
+
+
     return [
-        PhysicalProduct("1001", "Keyboard", 30.00, 10, 0.8),
-        PhysicalProduct("1002", "Mouse", 20.00, 15, 0.1),
-        PhysicalProduct("1003", "Monitor", 150.00, 5, 4.5),
-        PhysicalProduct("1004", "Printer", 200.00, 3, 7.0),
-        DigitalProduct("1005", "Photo Editor", 59.90, 100, 250.0),
-        DigitalProduct("1006", "E-book", 15.00, 100, 5.0),
+        PhysicalProduct("1001", "Keyboard", 30.00, 10, tech_supplier, 0.8),
+        PhysicalProduct("1002", "Mouse", 20.00, 15, tech_supplier, 0.1),
+        PhysicalProduct("1003", "Monitor", 150.00, 5, tech_supplier, 4.5),
+        PhysicalProduct("1004", "Printer", 200.00, 3, tech_supplier, 7.0),
+        DigitalProduct("1005", "Photo Editor", 59.90, 100, soft_supplier, 250.0),
+        DigitalProduct("1006", "E-book", 15.00, 100, soft_supplier, 5.0),
     ]
 
 def show_menu():
@@ -38,52 +46,76 @@ def show_menu():
     print("-------------------------------------------")
 
 
-def add_product_input(inventory):
+
+def find_supplier(inventory: Inventory, supplier_id: str) -> Supplier | None:
+    for product in inventory.get_all_products():
+        supplier = product.get_supplier()
+        if supplier.get_supplier_id() == supplier_id:
+            return supplier
+    return None
+
+
+def ask_supplier(inventory: Inventory) -> Supplier:
+    supplier_id: str = input("Enter Supplier ID: ")
+    existing: Supplier | None = find_supplier(inventory, supplier_id)
+
+    if existing is not None:
+        print(f"Using existing supplier: {existing.get_name()}")
+        return existing
+
+    name: str = input("Enter Supplier Name: ")
+    contact_email: str = input("Enter Supplier Contact Email: ")
+    return Supplier(supplier_id, name, contact_email)
+
+
+def add_product_input(inventory: Inventory) -> None :
     print("\nProduct type:")
     print("1. Physical Product")
     print("2. Digital Product")
-    type_choice = input("Enter product type (1 or 2): ")
+    type_choice: str = input("Enter product type (1 or 2): ")
 
     if type_choice not in ('1', '2'):
         print("Invalid choice. Please enter 1 or 2.")
         return
 
 
-    product_id = input("Enter Product ID: ")
-    name = input("Enter Product Name: ")
-    price = float(input("Enter Product Price: "))
-    stock = int(input("Enter Product Stock: "))
+    product_id: str = input("Enter Product ID: ")
+    name: str = input("Enter Product Name: ")
+    price: float = float(input("Enter Product Price: "))
+    stock: int = int(input("Enter Product Stock: "))
+    supplier: Supplier = ask_supplier(inventory)
 
+    new_product = Product
     if type_choice == '1':
-        weight = float(input("Enter Product Weight (in kg): "))
-        new_product = PhysicalProduct(product_id, name, price, stock, weight)
+        weight: float = float(input("Enter Product Weight (in kg): "))
+        new_product = PhysicalProduct(product_id, name, price, stock, supplier, weight)
     else:
-        download_size = float(input("Enter Product Download Size (in MB): "))
-        new_product = DigitalProduct(product_id, name, price, stock, download_size)
+        download_size: float = float(input("Enter Product Download Size (in MB): "))
+        new_product = DigitalProduct(product_id, name, price, stock, supplier, download_size)
 
     if inventory.add_product(new_product):
         print(f"Product {name} added successfully!")
     
 
-def update_product_stock_input(inventory):
-    product_id = input("Enter Product ID to update stock: ")
+def update_product_stock_input(inventory: Inventory) -> None:
+    product_id: str = input("Enter Product ID to update stock: ")
 
-    product = inventory.search_product(product_id)
+    product: Product | None = inventory.search_product(product_id)
     if product is None:
         print(f"Product with ID {product_id} not found.")
         return
 
-    new_stock = int(input(f"Enter new stock for {product.get_name()}: "))
+    new_stock:int = int(input(f"Enter new stock for {product.get_name()}: "))
     if product.update_stock(new_stock):
         print(f"Stock for {product.get_name()} updated to {new_stock}.")
     else:
         print(f"Failed to update stock for {product.get_name()}. Please check the input value.")
 
 
-def search_product_input(inventory):
-    product_id = input("Enter Product ID to search: ")
+def search_product_input(inventory: Inventory)-> None:
+    product_id: str = input("Enter Product ID to search: ")
 
-    product = inventory.search_product(product_id)
+    product: Product | None = inventory.search_product(product_id)
     if product is None:
         print(f"\nProduct with ID {product_id} not found.")
     else:
@@ -92,8 +124,8 @@ def search_product_input(inventory):
 
 
 
-def save_inventory_ui(inventory):
-    result = save_inventory(inventory)
+def save_inventory_ui(inventory: Inventory) -> None:
+    result: bool = save_inventory(inventory)
 
     if result:
         print("\nInventory saved successfully!")
@@ -102,8 +134,8 @@ def save_inventory_ui(inventory):
 
 
 
-def setup_inventory(inventory):
-    result = load_inventory(inventory)
+def setup_inventory(inventory: Inventory) -> None:
+    result: str = load_inventory(inventory)
 
     if result == "loaded":
         print("\nInventory loaded successfully!")
@@ -125,7 +157,7 @@ def setup_inventory(inventory):
 # =================
 # ======================================================================
 
-def main():
+def main() -> None:
     print("=================================================================")
     print("INVENTORY MANAGEMENT SYSTEM")
     print("=================================================================")
@@ -139,10 +171,10 @@ def main():
    
 
 
-    exit_program = False
+    exit_program: bool = False
     while not exit_program:
         show_menu()
-        choice = input("Enter your choice (1-6): ")
+        choice: str = input("Enter your choice (1-6): ")
 
 
         if choice == '1':
